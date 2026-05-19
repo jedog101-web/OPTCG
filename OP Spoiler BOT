@@ -1,0 +1,36 @@
+name: OP Spoiler Bot
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # every 30 minutes
+  workflow_dispatch:         # lets you trigger it manually too
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run bot
+        run: python onepiece_spoiler_bot.py
+
+      - name: Save seen cards
+        uses: actions/upload-artifact@v4
+        with:
+          name: seen-cards
+          path: seen_cards.json
+          overwrite: true
+
+      - name: Restore seen cards
+        uses: actions/download-artifact@v4
+        with:
+          name: seen-cards
+        continue-on-error: true  # won't fail on first run
